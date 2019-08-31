@@ -110,7 +110,7 @@ def search_vod_log(p, sv, vdcp):
             elif ((idx - found_on) >= 6) and triggered:
                 #print("end")
                 
-                if word_count >= 10:
+                if word_count >= 20:
                     end_line = row
                     parse_timestamps(start_line, end_line, sv, idx, vdcp)
                 triggered = False
@@ -124,6 +124,7 @@ def main(vod_id, client_id, source_video):
 
     # Create folder that are needed later
     make_output_dir()
+    make_output_dir("./clips")
     make_output_dir(vod_clip_path)
 
     if not os.path.exists(vod_log_path):
