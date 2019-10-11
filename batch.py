@@ -28,6 +28,7 @@ def parse_arguments():
 
     parser.add_argument(
         "source_videos",
+        nargs='?',
         help="Path to the twitch VOD video file directory",
         type=str
     )
@@ -47,14 +48,23 @@ def main(vod_ids, client_id, source_videos):
 
     file_paths = []
 
-    for folder, subs, files in os.walk(source_videos):
-        for filename in files:
-            file_paths.append(os.path.abspath(os.path.join(folder, filename)))
+    if source_videos != None:
+        for folder, subs, files in os.walk(source_videos):
+            for filename in files:
+                file_paths.append(os.path.abspath(os.path.join(folder, filename)))
     
     print(file_paths)
 
-    for vod, fp in zip(id_list, file_paths):
-        mn.main(vod, client_id, fp)
+    if source_videos != None:
+        for vod, fp in zip(id_list, file_paths):
+            mn.main(vod, client_id, fp)
+    else:
+        for vod in id_list:
+            print(vod)
+
+            sv = None
+
+            mn.main(vod, client_id, sv)
 
 if __name__ == "__main__":
     args = parse_arguments()

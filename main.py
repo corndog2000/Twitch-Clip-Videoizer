@@ -18,7 +18,7 @@ import tcd
 def parse_arguments():
 
     # Parse command line arguments
-    parser = argparse.ArgumentParser(prog="mian.py")
+    parser = argparse.ArgumentParser(prog="main.py")
 
     parser.add_argument(
         "vod_id", 
@@ -34,6 +34,7 @@ def parse_arguments():
 
     parser.add_argument(
         "source_video",
+        nargs='?',
         help="Path to the twitch VOD video file",
         type=str
     )
@@ -124,14 +125,33 @@ def main(vod_id, client_id, source_video):
 
     # Create folder that are needed later
     make_output_dir()
+    make_output_dir("./resources/videos")
+    make_output_dir("./clips")
     make_output_dir(vod_clip_path)
 
+    # Download the VOD video file
+    if source_video == None:
+        os.system("twitch-dl download " + vod_id)
+        
+        to_remove = ""
+
+        for folder, subs, files in os.walk("./"):
+            for filename in files:
+                filepath = os.path.abspath(os.path.join(folder, filename))
+                
+                if filepath.endswith(".mkv"):
+                    source_video = filepath
+                    to_remove = filepath
+
+    # Download the VOD transcript
     if not os.path.exists(vod_log_path):
         run_tcd(v=vod_id, c=client_id)
 
     print("Starting the search for moments")
     search_vod_log(("./resources/" + vod_id + ".log"), source_video, vod_clip_path)
     print("Done searching")
+
+    os.remove(to_remove)
 
 
 if __name__ == "__main__":
