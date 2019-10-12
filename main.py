@@ -15,6 +15,8 @@ from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 # Twitch chat downloader: https://pypi.org/project/tcd/
 import tcd
 
+# Twitch-dl is needed to download the VODs. You can get it here: https://pypi.org/project/twitch-dl/
+
 def parse_arguments():
 
     # Parse command line arguments
@@ -22,7 +24,7 @@ def parse_arguments():
 
     parser.add_argument(
         "vod_id", 
-        help="ID number of the Twitch VOD. Example: Given the url https://www.twitch.tv/videos/461450418 the ID is 461450418", 
+        help="ID number of the Twitch VOD. Example: Given the url https://www.twitch.tv/videos/123456789 the ID is 123456789", 
         type=str
     )
 
@@ -62,7 +64,7 @@ def parse_timestamps(a, b, sv, idx, vdcp):
 
     # change the number below to set how many seconds before the detection to start the clip
     a_timestamp = get_sec(a_timestamp)
-    a_timestamp = a_timestamp - 20
+    a_timestamp = a_timestamp - 50
 
     b_timestamp = b[:b.find("]")]
     if b_timestamp[0] == "[":
@@ -70,9 +72,10 @@ def parse_timestamps(a, b, sv, idx, vdcp):
     
     # change the number below to set how many seconds after the detection to continue the clip
     b_timestamp = get_sec(b_timestamp)
-    b_timestamp = b_timestamp + 10
+    b_timestamp = b_timestamp + 50
 
     print("Generating clip")
+    # This is where we run ffmpeg to slice up the video file.
     ffmpeg_extract_subclip(sv, a_timestamp, b_timestamp, targetname=(vdcp + "/" + str(idx) + ".mkv"))
 
 def search_vod_log(p, sv, vdcp):
@@ -107,11 +110,11 @@ def search_vod_log(p, sv, vdcp):
                 found_on = idx
                 word_count += 1
 
-            # If it's been 6 messages since the last occurance of word so we will stop the selection
-            elif ((idx - found_on) >= 6) and triggered:
+            # It's been 6 messages since the last occurance of word so we will stop the selection
+            elif ((idx - found_on) >= 2) and triggered:
                 #print("end")
                 
-                if word_count >= 20:
+                if word_count >= 13:
                     end_line = row
                     parse_timestamps(start_line, end_line, sv, idx, vdcp)
                 triggered = False
@@ -129,11 +132,11 @@ def main(vod_id, client_id, source_video):
     make_output_dir("./clips")
     make_output_dir(vod_clip_path)
 
+
     # Download the VOD video file
+    to_remove = ""
     if source_video == None:
         os.system("twitch-dl download " + vod_id)
-        
-        to_remove = ""
 
         for folder, subs, files in os.walk("./"):
             for filename in files:
@@ -151,7 +154,8 @@ def main(vod_id, client_id, source_video):
     search_vod_log(("./resources/" + vod_id + ".log"), source_video, vod_clip_path)
     print("Done searching")
 
-    os.remove(to_remove)
+    if to_remove != "":
+        os.remove(to_remove)
 
 
 if __name__ == "__main__":

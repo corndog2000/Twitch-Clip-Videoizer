@@ -1,0 +1,1 @@
+python main.py 345491502 jffvo5isn2zapq6np7grgho8a5nc0i C:\Users\joesc\Documents\GitHub\Twitch-Clip-Videoizer\resources\videos\Part14.mkv

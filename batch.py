@@ -12,11 +12,11 @@ import main as mn
 
 def parse_arguments():
     # Parse command line arguments
-    parser = argparse.ArgumentParser(prog="mian.py")
+    parser = argparse.ArgumentParser(prog="batch.py")
 
     parser.add_argument(
-        "vod_ids", 
-        help="Text file with ID numbers of the Twitch VODs. Example: Given the url https://www.twitch.tv/videos/461450418 the ID is 461450418", 
+        "vod_ids",
+        help="Text file with ID numbers of the Twitch VODs, one per line. Example: Given the url https://www.twitch.tv/videos/123456789 the ID is 123456789", 
         type=str
     )
 
@@ -57,6 +57,11 @@ def main(vod_ids, client_id, source_videos):
 
     if source_videos != None:
         for vod, fp in zip(id_list, file_paths):
+            if vod in fp:
+                print(f"$$$ VOD {vod} matches Video file {fp}. $$$")
+            else:
+                exit(f"XXX VOD {vod} doesn't match Video file {fp}. XXX")
+            
             mn.main(vod, client_id, fp)
     else:
         for vod in id_list:

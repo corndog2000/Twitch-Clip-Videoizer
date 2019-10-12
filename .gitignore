@@ -2,3 +2,4 @@
 /clips
 .vscode/launch.json
 __pycache__/main.cpython-37.pyc
+.vscode/settings.json
